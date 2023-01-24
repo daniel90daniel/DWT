@@ -9,6 +9,9 @@ export const apiSlice = createApi({
     getTopstories: builder.query({
       query: () => '/topstories.json?print=pretty',
     }),
+    getNewstories: builder.query({
+      query: () => '/newstories.json?print=pretty',
+    }),
     getItem: builder.query({
       query: item => `/item/${item}.json?print=pretty`,
       providesTags: (result, error, arg) => [{ type: 'Post', id: arg }]
@@ -17,6 +20,7 @@ export const apiSlice = createApi({
 })
 export const { 
   useGetTopstoriesQuery,
+  useGetNewstoriesQuery,
   useGetItemQuery
  } = apiSlice
 

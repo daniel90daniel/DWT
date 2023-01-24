@@ -1,6 +1,8 @@
 import React from 'react'
-import { useGetTopstoriesQuery, useGetItemQuery} from '../api/api'
-const PostCard = ({ content }) => {
+import { useGetNewstoriesQuery, useGetItemQuery} from '../api/api';
+import {Text, View, FlatList, TouchableOpacity} from 'react-native';
+
+const RenderRow = ({ content, index }) => {
     const {
         data: post,
         isLoading,
@@ -8,66 +10,68 @@ const PostCard = ({ content }) => {
         isError,
         error,
         } = useGetItemQuery(content)
+        let row;
         if (isLoading) {
-            postContent = (
-              <div className="d-flex justify-content-center">
-                <div className="spinner-border" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
-              </div>
-            )
+            row = null;
           } else if (isSuccess) {
-            console.log(post)
-            postContent = (
-                <div className="col-lg-12 mb-3 " key={post.id}>
-                  <div className="card">
-                    <div className="card-body">
-                      <h5 className="card-title">{post.title}</h5>
-                      <p className="card-text">{post.by}</p>
-                    </div>
-                  </div>
-                </div>
+            let domain;
+            if(post.url){
+                domain = (new URL(post.url));
+                domain = domain.hostname.replace('www.','');
+            }
+            row = (
+                <View style={{ margin: 5, flexDirection:"row", marginTop: 7}}>
+                    <View style={{ marginLeft: 5, flexDirection:"row"}}>
+                        <Text style={{ fontSize: 14 }}>{index+1}. </Text>
+                        <Text style={{ fontSize: 12 }}>▲</Text>
+                    </View>
+                    <View style={{ marginLeft:3,flexDirection:"column"}}>
+                        <TouchableOpacity onPress={()=> window.open(post.url, '_blank')}>
+                            <Text style={{ fontSize: 14, fontWeight:"500" }}>{post.title} <Text style={{ fontSize: 10 }}> ({domain})</Text></Text>
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 10, marginTop: 3 }}>{post.score} point by {post.by}</Text>
+                    </View>
+                </View>
               )
           } else if (isError) {
-            postContent = (
-              <div className="alert alert-danger" role="alert">
-                {error}
-              </div>
+            row = (
+                <View>
+                    {error}
+                </View>
             )
           }
-          return <div>{postContent}</div>
-  /*return */
+          return row;
 }
-function Row() {
+function ListItem() {
   const {
-    data: posts,
+    data: items,
     isLoading,
     isSuccess,
     isError,
     error,
-  } = useGetTopstoriesQuery()
-  let postContent
+  } = useGetNewstoriesQuery()
+  let list;
   if (isLoading) {
-    postContent = (
-      <div className="d-flex justify-content-center">
-        <div className="spinner-border" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
+    list = (
+        <View>
+          <Text>Loading...</Text>
+        </View>
     )
   } else if (isSuccess) {
-    console.log(posts)
-    postContent = posts.map((item) => {
-      return  <PostCard content={item}/>
-      
-    })
+    return (
+        <FlatList
+            data={items}
+            renderItem={({item, index}) => <RenderRow content={item} index={index} />}
+            keyExtractor={item => item}
+        />
+    )
   } else if (isError) {
-    postContent = (
-      <div className="alert alert-danger" role="alert">
-        {error}
-      </div>
+    list = (
+        <View>
+            {error}
+        </View>
     )
   }
-  return <div>{postContent}</div>
+  return list
 }
-export default Row
+export default ListItem
