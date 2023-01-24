@@ -9,3 +9,8 @@ existing HackerNews website.
 - Use the following colors: white, black, #ff6600, #f6f6ef.
 - You are free to use any CSS or UI framework of your choice.
 - Focus on the desktop view, with screens between 1200px and full hd.
+
+# Start 
+- clone project 
+- npm install for install node modules
+- npm run web
